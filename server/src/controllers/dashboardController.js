@@ -98,6 +98,27 @@ async function getStats(req, res, next) {
       status: p.quantity === 0 ? "Out of Stock" : "Low Stock",
     }));
 
+    // --- Sales by Category ---
+    const orderItemsWithProduct = await prisma.orderItem.findMany({
+      include: { product: { select: { category: true } } },
+    });
+
+    const KNOWN_CATEGORIES = ["Electronics", "Clothing", "Groceries", "Furniture"];
+    const categoryTotals = { Electronics: 0, Clothing: 0, Groceries: 0, Furniture: 0, Other: 0 };
+
+    orderItemsWithProduct.forEach((item) => {
+      const cat = item.product?.category;
+      if (KNOWN_CATEGORIES.includes(cat)) {
+        categoryTotals[cat] += item.lineTotal;
+      } else {
+        categoryTotals.Other += item.lineTotal;
+      }
+    });
+
+    const salesByCategory = Object.entries(categoryTotals)
+      .map(([name, value]) => ({ name, value: Number(value.toFixed(2)) }))
+      .filter((c) => c.value > 0);
+
     return res.json({
       success: true,
       data: {
@@ -108,6 +129,7 @@ async function getStats(req, res, next) {
         weeklyOrders,
         recentOrders,
         lowStockProducts,
+        salesByCategory,
       },
     });
   } catch (err) {

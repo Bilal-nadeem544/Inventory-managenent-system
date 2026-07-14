@@ -24,7 +24,6 @@ import StatCard from "../components/layout/StatCard";
 import { fetchDashboardStats } from "../api/dashboardApi";
 import {
   salesTrend,
-  salesByCategory,
   statusStyles,
 } from "../data/dummyData";
 
@@ -83,6 +82,7 @@ export default function Dashboard() {
   const weeklyOrders = stats?.weeklyOrders || [];
   const recentOrders = stats?.recentOrders || [];
   const lowStockProducts = stats?.lowStockProducts || [];
+  const salesByCategory = stats?.salesByCategory || [];
 
   return (
     <div className="space-y-6">
@@ -127,7 +127,7 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* Sales by category - pie chart (dummy data, not yet wired) */}
+        {/* Sales by category - pie chart (real data) */}
         <div className="bg-[#FFFDF8] rounded-2xl p-5 border border-[#E6D9C3] shadow-sm">
           <h3 className="text-sm font-semibold text-[#4A3D30] mb-4">Sales Breakdown by Category</h3>
           <ResponsiveContainer width="100%" height={220}>
@@ -147,6 +147,9 @@ export default function Dashboard() {
                 {entry.name}
               </div>
             ))}
+            {salesByCategory.length === 0 && (
+              <p className="text-xs text-[#B0A48D]">Abhi koi sales data nahi hai.</p>
+            )}
           </div>
         </div>
       </div>
